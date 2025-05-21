@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../auth/login_page.dart';
 import '../exam/exam_verification_page.dart';
+import '../instructor/exam_attendance_report_page.dart';
 import 'invigilator_profile_page.dart';
 import 'invigilator_settings_page.dart';
 import 'invigilator_profile_page.dart';
-import '../instructor/exam_attendance_report_page.dart';
-
 
 class InvigilatorDashboard extends StatelessWidget {
   Future<String?> _fetchUserName() async {
@@ -34,14 +33,14 @@ class InvigilatorDashboard extends StatelessWidget {
         ),
       );
     }
-    void _navigateToExamAttendanceReport() {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (context) => ExamAttendanceReportPage(),
-    ),
-  );
-}
 
+    void _navigateToExamAttendanceReport() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ExamAttendanceReportPage(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -112,15 +111,13 @@ class InvigilatorDashboard extends StatelessWidget {
                 },
               ),
               ListTile(
-  leading: Icon(Icons.report, color: Colors.blueGrey),
-  title: Text('Exam Attendance Report'),
-  onTap: () {
-    Navigator.of(context).pop();
-    _navigateToExamAttendanceReport();
-  },
-),
-
-              
+                leading: Icon(Icons.list_alt, color: Colors.blueGrey),
+                title: Text('Attendance Report'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _navigateToExamAttendanceReport();
+                },
+              ),
               // Add more invigilator-specific navigation items here
               ListTile(
                 leading: Icon(Icons.logout, color: Colors.redAccent),
@@ -165,11 +162,18 @@ class InvigilatorDashboard extends StatelessWidget {
                   ),
                   _buildDashboardCard(
                     context,
+                    icon: Icons.list_alt,
+                    title: 'Attendance Report',
+                    color: Colors.blue.shade500,
+                    onTap: _navigateToExamAttendanceReport,
+                  ),
+                  _buildDashboardCard(
+                    context,
                     icon: Icons.person,
                     title: 'Profile',
                     color: Colors.blue.shade400,
                     onTap: () {
-                      
+                      // Add navigation to profile page if available
                     },
                   ),
                   _buildDashboardCard(
@@ -183,14 +187,6 @@ class InvigilatorDashboard extends StatelessWidget {
                       );
                     },
                   ),
-                  _buildDashboardCard(
-  context,
-  icon: Icons.report,
-  title: 'Attendance Report',
-  color: Colors.blue.shade500,
-  onTap: _navigateToExamAttendanceReport,
-),
-
                   _buildDashboardCard(
                     context,
                     icon: Icons.logout,
@@ -234,3 +230,4 @@ class InvigilatorDashboard extends StatelessWidget {
     );
   }
 }
+

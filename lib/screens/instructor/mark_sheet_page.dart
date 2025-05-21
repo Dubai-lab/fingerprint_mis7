@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 class MarkSheetPage extends StatefulWidget {
   const MarkSheetPage({Key? key}) : super(key: key);
@@ -93,11 +97,75 @@ class _MarkSheetPageState extends State<MarkSheetPage> {
     return count > 10 ? 10 : count.toDouble();
   }
 
+  Future<void> _exportToExcel() async {
+    var status = await Permission.storage.request();
+    if (!status.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Storage permission is required to export Excel file')),
+      );
+      return;
+    }
+
+    var excel = Excel.createExcel();
+    Sheet sheetObject = excel['MarkSheet'];
+
+    // Add header row
+    sheetObject.cell(CellIndex.indexByString("A1")).value = "S/N" as CellValue?;
+    sheetObject.cell(CellIndex.indexByString("B1")).value = "Reg No." as CellValue?;
+    sheetObject.cell(CellIndex.indexByString("C1")).value = "Name" as CellValue?;
+    sheetObject.cell(CellIndex.indexByString("D1")).value = "Attendance/10" as CellValue?;
+
+    // Add student data rows
+    for (int i = 0; i < _students.length; i++) {
+      final student = _students[i];
+      final studentId = student['studentId'] ?? '';
+      final fullName = student['fullName'] ?? '';
+      final attendanceScore = _calculateAttendanceScore(studentId);
+
+      sheetObject.cell(CellIndex.indexByString("A${i + 2}")).value = (i + 1) as CellValue?;
+      sheetObject.cell(CellIndex.indexByString("B${i + 2}")).value = studentId;
+      sheetObject.cell(CellIndex.indexByString("C${i + 2}")).value = fullName;
+      sheetObject.cell(CellIndex.indexByString("D${i + 2}")).value = attendanceScore as CellValue?;
+    }
+
+    // Save file
+    final directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cannot access storage directory')),
+      );
+      return;
+    }
+
+    String filePath = '${directory.path}/MarkSheet_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    final fileBytes = excel.encode();
+    if (fileBytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to encode Excel file')),
+      );
+      return;
+    }
+
+    final file = File(filePath);
+    await file.writeAsBytes(fileBytes);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Excel file saved at $filePath')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mark Sheet'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.download),
+            tooltip: 'Export to Excel',
+            onPressed: _exportToExcel,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -149,3 +217,4 @@ class _MarkSheetPageState extends State<MarkSheetPage> {
     );
   }
 }
+

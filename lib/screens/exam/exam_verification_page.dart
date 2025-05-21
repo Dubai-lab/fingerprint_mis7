@@ -183,9 +183,19 @@ class _ExamVerificationPageState extends State<ExamVerificationPage> {
         return;
       }
 
+      // Find course name from _coursesWithExam list
+      String courseName = '';
+      for (var course in _coursesWithExam) {
+        if (course['id'] == _selectedCourseId) {
+          courseName = course['name'] ?? '';
+          break;
+        }
+      }
+
       await FirebaseFirestore.instance.collection('exam_attendance').add({
         'studentId': _matchedStudentId,
         'courseId': _selectedCourseId,
+        'courseName': courseName,
         'examType': _selectedExamType,
         'status': 'Present',
         'timestamp': FieldValue.serverTimestamp(),
@@ -470,3 +480,4 @@ class _ExamVerificationPageState extends State<ExamVerificationPage> {
     );
   }
 }
+
