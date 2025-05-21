@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "65147284637",
+    "project_id": "fingerprint-reader-test",
+    "storage_bucket": "fingerprint-reader-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65147284637:android:cd83de8f7787e0bed7f874",
+        "android_client_info": {
+          "package_name": "com.example.fingerprint_mis7"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2032ec5xmpT1M_9WTTU4K_CySsM_sG64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
