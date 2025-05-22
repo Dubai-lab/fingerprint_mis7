@@ -51,7 +51,6 @@ class _JoinCoursesPageState extends State<JoinCoursesPage> {
         return;
       }
       final courseData = courseSnapshot.data()!;
-      print('Adding joined course document with courseId: $courseId');
       await joinedCoursesCollection.add({
         'studentUid': _uid,
         'studentId': studentId,
@@ -66,9 +65,6 @@ class _JoinCoursesPageState extends State<JoinCoursesPage> {
         'joinedAt': now,
       });
 
-      // Optionally, remove the course from available courses for this student by adding a field or filtering in UI
-      // Here, no direct removal from courses collection, but UI filters out joined courses
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Successfully joined the course')),
       );
@@ -81,14 +77,6 @@ class _JoinCoursesPageState extends State<JoinCoursesPage> {
 
   Stream<QuerySnapshot> _fetchAvailableCourses() {
     final now = DateTime.now();
-    final deadline = now.subtract(Duration(hours: 48));
-
-    // Fetch courses assigned to instructors where endDate is after now
-    // Exclude courses already joined by this student
-    // This requires a two-step approach: fetch joined courses ids, then filter courses
-
-    // For simplicity, fetch all courses with endDate > now and assignedInstructorId != null
-    // Then filter out joined courses in the UI
 
     return FirebaseFirestore.instance
         .collection('courses')
@@ -124,28 +112,29 @@ class _JoinCoursesPageState extends State<JoinCoursesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Join Courses'),
+        backgroundColor: Colors.teal.shade700,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _fetchAvailableCourses(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Error loading courses'));
+            return Center(child: Text('Error loading courses', style: TextStyle(color: Colors.red.shade700)));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: Colors.teal.shade700));
           }
           final courses = snapshot.data?.docs ?? [];
           return FutureBuilder<List<String>>(
             future: _fetchJoinedCourseIds(),
             builder: (context, joinedSnapshot) {
               if (!joinedSnapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: Colors.teal.shade700));
               }
               final joinedCourseIds = joinedSnapshot.data!;
               final availableCourses = courses.where((doc) => !joinedCourseIds.contains(doc.id)).toList();
 
               if (availableCourses.isEmpty) {
-                return Center(child: Text('No courses available to join'));
+                return Center(child: Text('No courses available to join', style: TextStyle(color: Colors.teal.shade700)));
               }
 
               return ListView.builder(
@@ -163,25 +152,33 @@ class _JoinCoursesPageState extends State<JoinCoursesPage> {
                     future: _fetchInstructorName(assignedInstructorId),
                     builder: (context, instructorSnapshot) {
                       final instructorName = instructorSnapshot.data ?? 'Unknown Instructor';
-                      return ListTile(
-                        title: Text('$courseName ($courseCode)'),
-                        subtitle: Text(
-                          'Instructor: $instructorName\n'
-                          'Start: ${startDate != null ? startDate.toLocal().toString().split(' ')[0] : 'N/A'}\n'
-                          'End: ${endDate != null ? endDate.toLocal().toString().split(' ')[0] : 'N/A'}',
-                        ),
-                        trailing: ElevatedButton(
-                          onPressed: () {
-                            final now = DateTime.now();
-                            if (startDate != null && now.isAfter(startDate.add(Duration(hours: 48)))) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Join deadline has passed')),
-                              );
-                              return;
-                            }
-                            _joinCourse(doc.id);
-                          },
-                          child: Text('Join'),
+                      return Card(
+                        margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                        color: Colors.teal.shade50,
+                        child: ListTile(
+                          title: Text('$courseName ($courseCode)', style: TextStyle(color: Colors.teal.shade900, fontWeight: FontWeight.bold)),
+                          subtitle: Text(
+                            'Instructor: $instructorName\n'
+                            'Start: ${startDate != null ? startDate.toLocal().toString().split(' ')[0] : 'N/A'}\n'
+                            'End: ${endDate != null ? endDate.toLocal().toString().split(' ')[0] : 'N/A'}',
+                            style: TextStyle(color: Colors.teal.shade700),
+                          ),
+                          trailing: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal.shade700,
+                            ),
+                            onPressed: () {
+                              final now = DateTime.now();
+                              if (startDate != null && now.isAfter(startDate.add(Duration(hours: 48)))) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Join deadline has passed')),
+                                );
+                                return;
+                              }
+                              _joinCourse(doc.id);
+                            },
+                            child: Text('Join'),
+                          ),
                         ),
                       );
                     },

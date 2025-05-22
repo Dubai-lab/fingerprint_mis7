@@ -13,6 +13,7 @@ import '../../screens/auth/register/student_registration_page.dart';
 import '../profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../screens/auth/register/instructor_registration_page.dart';
+import '../../screens/admin/admin_student_course_management_page.dart';
 
 class AdminDashboard extends StatelessWidget {
   Future<String?> _fetchUserName() async {
@@ -218,7 +219,19 @@ Divider(),
                   );
                 },
               ),
+             
               Divider(),
+              ListTile(
+                leading: Icon(Icons.search, color: Colors.blueGrey),
+                title: Text('Student Course Management'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => AdminStudentCourseManagementPage(initialStudentId: '',)),
+                  );
+                },
+              ),
+               Divider(),
               ListTile(
                 leading: Icon(Icons.logout, color: Colors.redAccent),
                 title: Text('Logout', style: TextStyle(color: Colors.redAccent)),
@@ -241,7 +254,7 @@ Divider(),
             SizedBox(height: 20),
             DashboardSummaryCards(),
             SizedBox(height: 20),
-            // Removed Manage Students and Manage Professors buttons from main screen as per feedback
+            // Removed Student ID search bar as per user request
           ],
         ),
       ),

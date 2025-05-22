@@ -159,53 +159,68 @@ class _StudentVerificationPageState extends State<StudentVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Student Verification'),
+        backgroundColor: Colors.teal.shade700,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text('Status: $_status'),
+            Text('Status: $_status', style: TextStyle(color: Colors.teal.shade900, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
             Wrap(
               spacing: 10,
               children: [
                 ElevatedButton(
                   onPressed: _openDevice,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600),
                   child: Text('Open Device'),
                 ),
                 ElevatedButton(
                   onPressed: _closeDevice,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600),
                   child: Text('Close Device'),
                 ),
                 ElevatedButton(
                   onPressed: _generateTemplate,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600),
                   child: Text('Scan Fingerprint'),
                 ),
               ],
             ),
             SizedBox(height: 20),
             _matchedStudentData != null
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Student ID: ${_matchedStudentData!['studentId'] ?? ''}', style: TextStyle(fontSize: 16)),
-                      Text(
-                        'Name: ${[_matchedStudentData!['firstName'], _matchedStudentData!['middleName'], _matchedStudentData!['lastName']].where((s) => s != null && s.isNotEmpty).join(' ')}',
-                        style: TextStyle(fontSize: 16),
+                ? Card(
+                    color: Colors.teal.shade50,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Student ID: ${_matchedStudentData!['studentId'] ?? ''}', style: TextStyle(fontSize: 16, color: Colors.teal.shade900, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text(
+                            'Name: ${[_matchedStudentData!['firstName'], _matchedStudentData!['middleName'], _matchedStudentData!['lastName']].where((s) => s != null && s.isNotEmpty).join(' ')}',
+                            style: TextStyle(fontSize: 16, color: Colors.teal.shade800),
+                          ),
+                          SizedBox(height: 4),
+                          Text('Email: ${_matchedStudentData!['email'] ?? ''}', style: TextStyle(fontSize: 16, color: Colors.teal.shade800)),
+                          SizedBox(height: 4),
+                          Text('Department: ${_matchedStudentData!['department'] ?? ''}', style: TextStyle(fontSize: 16, color: Colors.teal.shade800)),
+                          SizedBox(height: 4),
+                          Text('Program: ${_matchedStudentData!['program'] ?? ''}', style: TextStyle(fontSize: 16, color: Colors.teal.shade800)),
+                        ],
                       ),
-                      Text('Email: ${_matchedStudentData!['email'] ?? ''}', style: TextStyle(fontSize: 16)),
-                      Text('Department: ${_matchedStudentData!['department'] ?? ''}', style: TextStyle(fontSize: 16)),
-                      Text('Program: ${_matchedStudentData!['program'] ?? ''}', style: TextStyle(fontSize: 16)),
-                    ],
+                    ),
                   )
-                : Text('No student matched', style: TextStyle(fontSize: 16)),
+                : Text('No student matched', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
           ],
         ),
       ),
     );
   }
 }
-

@@ -36,6 +36,7 @@ class _JoinedCoursesPageState extends State<JoinedCoursesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Joined Courses'),
+        backgroundColor: Colors.teal.shade700,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -44,14 +45,14 @@ class _JoinedCoursesPageState extends State<JoinedCoursesPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Error loading joined courses'));
+            return Center(child: Text('Error loading joined courses', style: TextStyle(color: Colors.red.shade700)));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: Colors.teal.shade700));
           }
           final joinedCourses = snapshot.data?.docs ?? [];
           if (joinedCourses.isEmpty) {
-            return Center(child: Text('No joined courses found'));
+            return Center(child: Text('No joined courses found', style: TextStyle(color: Colors.teal.shade700)));
           }
           return ListView.builder(
             itemCount: joinedCourses.length,
@@ -68,12 +69,17 @@ class _JoinedCoursesPageState extends State<JoinedCoursesPage> {
                 future: _fetchInstructorName(assignedInstructorId),
                 builder: (context, instructorSnapshot) {
                   final instructorName = instructorSnapshot.data ?? 'Unknown Instructor';
-                  return ListTile(
-                    title: Text('$courseName ($courseCode)'),
-                    subtitle: Text(
-                      'Instructor: $instructorName\n'
-                      'Start: ${startDate != null ? startDate.toLocal().toString().split(' ')[0] : 'N/A'}\n'
-                      'End: ${endDate != null ? endDate.toLocal().toString().split(' ')[0] : 'N/A'}',
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    color: Colors.teal.shade50,
+                    child: ListTile(
+                      title: Text('$courseName ($courseCode)', style: TextStyle(color: Colors.teal.shade900, fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                        'Instructor: $instructorName\n'
+                        'Start: ${startDate != null ? startDate.toLocal().toString().split(' ')[0] : 'N/A'}\n'
+                        'End: ${endDate != null ? endDate.toLocal().toString().split(' ')[0] : 'N/A'}',
+                        style: TextStyle(color: Colors.teal.shade700),
+                      ),
                     ),
                   );
                 },
